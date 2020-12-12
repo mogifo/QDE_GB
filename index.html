@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Spatial Structure of Guinea Bissau</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css" rel="stylesheet" />
+<style>  
+	body { 
+      margin: 0; 
+      padding: 0; 
+      font-family: sans-serif; 
+      font-size:12px;
+    }
+	#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    li {
+    padding: 3px 0;  
+    }
+  #panel {
+    background: white; 
+    width: 300px; 
+    border: 1px solid rgba (0, 0, 0, 0.05);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.5);  
+  }
+  h4 {
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    margin: 0px;
+    padding: 10px;
+  }
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 16px;
+  }
+  ul span {
+    display: inline-block;
+    margin-right: 8px     
+  }
+  dd {
+      margin-left:0;
+      margin-bottom: 8px;
+      font-weight: bold;    
+  }
+  .mapboxgl-popup-content{
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
+      padding: 8px;
+      min-width:250px;
+      max-width:400px;
+      box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
+  }
+  dl {
+      margin-bottom: 0px;
+  }
+</style>
+</head>
+<body>
+<div id="map"></div> 
+<div id="panel">
+   <h4> Quadro de desenvolvimento Espacial de Guinea Bissau</h4>
+    <ul>
+      <li><span style="background:#c2a500;width: 10px;height: 10px;border: dashed 1.5px #bec6cc"></span>Cluster Primário Nacional</li>
+      <li><span style="background:#e8d769;width: 10px;height: 10px;border: dashed 1.5px #bec6cc"></span>Cluster Primário Provincial</li>
+      <li><span style="background:#f2f1d4;width: 10px;height: 10px;border: dashed 1.5px #bec6cc"></span>Cluster Secundário Regional</li>
+      <li><span style="background:#e8d769;width: 10px;height: 10px;border-radius:50%;border: solid 1px #a64c31"></span>Polo Económico</li>
+      <li><span style="background:#846300;width: 10px;height: 3px;"></span>Corredor Principal Terrestre</li>
+      <li><span style="background:#846300;width: 10px;height: 1.5px;"></span>Corredor Secundário Terrestre</li>
+      <li><span style="background:#136081;width: 10px;height: 3px;"></span>Corredor Principal Marítimo-fluvial</li>
+      <li><span style="background:#136081;width: 10px;height: 1.5px;"></span>Corredor Secundário Marítimo-fluvial</li>
+    
+   </ul>
+  </div>
+   
+  
+  
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoibW9naWZvIiwiYSI6ImNraTdvcWh6NjNjcXgycm1wbm1sMGRkNTkifQ.yritxH0KkRgsG1C-f7WLWg';
+var map = new mapboxgl.Map({
+container: 'map', // container id
+style: 'mapbox://styles/mogifo/cki974naj0lrg18o0fewanw92', // style URL
+center: [-15.267614, 11.862748], // starting position [lng, lat]
+zoom: 7.5,  // starting zoom
+minZoom: 7.5,
+maxZoom: 9,
+});
+var nav = new mapboxgl.NavigationControl();
+map.addControl(nav, 'top-right');
+
+map.on('mousemove', function(event) {
+    //consol.log (event);
+    if (map.loaded()) {
+        var features = map.queryRenderedFeatures(event.point, {
+            layers:['mof-sectors']
+        });
+        map.getCanvas().style.cursor= features.length ? 'pointer':'';
+    }       
+});
+map.on('click', function (event){
+    //console.log ('Mouse Clicked');
+    //console.log (event.point);
+
+    var geometry = event.point;  
+    var parameters  ={
+        layers:['mof-sectors']
+    };
+    var features = map.queryRenderedFeatures(geometry, parameters);
+    //console.log (features);
+    var lot= features [0];
+    console.log (lot);
+    if (features.length){
+    var nom_regc25 = lot.properties.NOM_REGC25;
+    var nom_secc25 = lot.properties.NOM_SECC25;
+    var category = lot.properties.Category;
+    var level_of_h = lot.properties.Level_of_h;
+    var structure = lot.properties.Structure;
+    var economic = lot.properties.Economic;
+    console.log (nom_regc25, nom_secc25, category, structure, economic);
+
+    var popup = new mapboxgl.Popup()
+    .setLngLat (event.lngLat)
+    .setHTML('<dl>'+
+        '<dt>Região</dt>'+
+        '<dd>' + nom_regc25 + '</dd>'+
+        '<dt>Sector</dt>'+
+        '<dd>' + nom_secc25 + '</dd>'+
+        '<dt>Categoria (MoF)</dt>'+
+        '<dd>' + category + '</dd>'+
+        '<dt>Nível hierarquico (MoF)</dt>'+
+        '<dd>' + level_of_h + '</dd>'+
+        '<dt>Elemento estructural</dt>'+
+        '<dd>' + structure + '</dd>'+
+        '<dt>Descrição</dt>'+
+        '<dd>' + economic + '</dd>'+
+        '</dl>')
+    .addTo (map);
+}
+    
+});
+
+</script>
+ 
+</body>
+</html>
